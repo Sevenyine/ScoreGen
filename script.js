@@ -1,33 +1,33 @@
 document.addEventListener("DOMContentLoaded", function() {
     fetch('https://gen.cdsv.cc/data/schools-data.xlsx')
-        .then(response => response.arrayBuffer())
-        .then(data => {
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            
-            // 填充学校下拉列表
-            populateSelectOptions(excelData);
+    .then(response => response.arrayBuffer())
+    .then(data => {
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+        const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        // 填充学校下拉列表
+        populateSelectOptions(excelData);
 
-            document.getElementById('next-button').addEventListener('click', function() {
-                const homeTeam = document.getElementById('home-team').value;
-                const awayTeam = document.getElementById('away-team').value;
+        document.getElementById('next-button').addEventListener('click', function() {
+            const homeTeam = document.getElementById('home-team').value;
+            const awayTeam = document.getElementById('away-team').value;
 
-                if (homeTeam && awayTeam) {
-                    const filteredData = filterData(excelData, homeTeam, awayTeam);
-                    displayFilteredData(filteredData);
-                } else {
-                    alert('请选择队伍');
-                }
-            });
+            if (homeTeam && awayTeam) {
+                const filteredData = filterData(excelData, homeTeam, awayTeam);
+                displayFormattedData(filteredData);
+            } else {
+                alert('请选择队伍');
+            }
         });
+    });
 
     function populateSelectOptions(data) {
         const homeTeamSelect = document.getElementById('home-team');
         const awayTeamSelect = document.getElementById('away-team');
 
-        const schools = new Set(data.slice(1).map(row => row[0])); // 获取所有学校名称
+        const schools = new Set(data.slice(2).map(row => row[0])); // 从第三行开始，获取所有学校名称
 
         schools.forEach(school => {
             const option1 = document.createElement('option');
@@ -43,20 +43,24 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function filterData(data, homeTeam, awayTeam) {
-        const header = data[0]; // 第一行作为表头
         const filteredData = data.filter(row => row[0] === homeTeam || row[0] === awayTeam);
-
-        return [header].concat(filteredData); // 包含表头的筛选结果
+        return filteredData;
     }
 
-    function displayFilteredData(filteredData) {
-        let output = "<h3>筛选后的学校数据：</h3><pre>";
+    function displayFormattedData(filteredData) {
+        let output = "";
 
-        filteredData.forEach(row => {
-            output += row.join(" | ") + "\n";
+        const categories = filteredData[0]; // 第一行是大分类
+        const subcategories = filteredData[1]; // 第二行是小分类
+
+        filteredData.slice(2).forEach((row, index) => {
+            output += `## ${categories[0]} ${index + 1}:\n`; // 大分类名加序号
+            subcategories.forEach((subcategory, idx) => {
+                output += `### ${subcategory}: ${row[idx]}\n`; // 小分类及其对应的内容
+            });
+            output += "\n";
         });
 
-        output += "</pre>";
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
     }
