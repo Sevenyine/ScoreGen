@@ -1,27 +1,27 @@
 document.addEventListener("DOMContentLoaded", function() {
     fetch('https://gen.cdsv.cc/data/schools-data.xlsx')
-    .then(response => response.arrayBuffer())
-    .then(data => {
-        const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-        
-        // 填充学校下拉列表
-        populateSelectOptions(excelData);
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            // 填充学校下拉列表
+            populateSelectOptions(excelData);
 
-        document.getElementById('next-button').addEventListener('click', function() {
-            const homeTeam = document.getElementById('home-team').value;
-            const awayTeam = document.getElementById('away-team').value;
+            document.getElementById('next-button').addEventListener('click', function() {
+                const homeTeam = document.getElementById('home-team').value;
+                const awayTeam = document.getElementById('away-team').value;
 
-            if (homeTeam && awayTeam) {
-                const filteredData = filterData(excelData, homeTeam, awayTeam);
-                displayFormattedData(filteredData);
-            } else {
-                alert('请选择队伍');
-            }
+                if (homeTeam && awayTeam) {
+                    const filteredData = filterData(excelData, homeTeam, awayTeam);
+                    displayFormattedData(filteredData);
+                } else {
+                    alert('请选择队伍');
+                }
+            });
         });
-    });
 
     function populateSelectOptions(data) {
         const homeTeamSelect = document.getElementById('home-team');
