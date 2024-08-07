@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", function() {
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
             const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-            
+
+            console.log("Excel Data:", excelData); // 调试输出：完整的 Excel 数据
+
             // 填充学校下拉列表
             populateSelectOptions(excelData);
 
@@ -17,6 +19,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (homeTeam && awayTeam) {
                     const filteredDataHome = filterData(excelData, homeTeam);
                     const filteredDataAway = filterData(excelData, awayTeam);
+
+                    console.log("Filtered Data Home:", filteredDataHome); // 调试输出：主场队伍的筛选结果
+                    console.log("Filtered Data Away:", filteredDataAway); // 调试输出：客场队伍的筛选结果
+
                     displayFormattedData(filteredDataHome, filteredDataAway);
                 } else {
                     alert('请选择队伍');
@@ -55,13 +61,18 @@ document.addEventListener("DOMContentLoaded", function() {
         const categoriesAway = filteredDataAway[0];
         const subcategoriesAway = filteredDataAway[1];
 
+        console.log("Categories Home:", categoriesHome); // 调试输出：主场队伍的大分类
+        console.log("Subcategories Home:", subcategoriesHome); // 调试输出：主场队伍的小分类
+        console.log("Categories Away:", categoriesAway); // 调试输出：客场队伍的大分类
+        console.log("Subcategories Away:", subcategoriesAway); // 调试输出：客场队伍的小分类
+
         let playerCounter = 1; // 选手计数器
 
         output += `<h2>${categoriesHome[0]}:</h2>`;
         filteredDataHome.slice(2).forEach(row => {
             output += `<h3>选手 ${playerCounter}:</h3>`;
             for (let i = 0; i < subcategoriesHome.length; i++) {
-                if (subcategoriesHome[i]) {
+                if (subcategoriesHome[i] && row[i]) {
                     output += `<p>${subcategoriesHome[i]}: ${row[i]}</p>`;
                 }
             }
@@ -72,17 +83,18 @@ document.addEventListener("DOMContentLoaded", function() {
         filteredDataAway.slice(2).forEach(row => {
             output += `<h3>选手 ${playerCounter}:</h3>`;
             for (let i = 0; i < subcategoriesAway.length; i++) {
-                if (subcategoriesAway[i]) {
+                if (subcategoriesAway[i] && row[i]) {
                     output += `<p>${subcategoriesAway[i]}: ${row[i]}</p>`;
                 }
             }
             playerCounter++;
         });
 
+        console.log("Output generated:", output); // 调试输出：生成的 HTML 内容
+
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
     }
-
 
     document.getElementById('generate-hash').addEventListener('click', function() {
         const results = collectResults();
