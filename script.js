@@ -88,7 +88,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
     }
-});
 
     document.getElementById('generate-hash').addEventListener('click', function() {
         const results = collectResults();
