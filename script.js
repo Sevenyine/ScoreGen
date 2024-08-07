@@ -56,7 +56,6 @@ document.addEventListener("DOMContentLoaded", function() {
     function displayFormattedData(filteredData) {
         let output = "<h3>筛选后的学校数据：</h3>";
     
-        // 假设 filteredData 的第一列是学校名称
         if (filteredData.length === 0) {
             console.warn("No data to display.");  // 调试信息
             output += "<p>没有数据可以展示。</p>";
@@ -69,12 +68,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 } else {
                     output += `<h4>选手 ${index}:</h4>`; // 大分类名加序号
                     for (let i = 1; i < row.length; i += 3) {
-                        const category = row[i];
-                        const subcategory1 = row[i + 1] || "无数据";
-                        const subcategory2 = row[i + 2] || "无数据";
-                        output += `<p><strong>分类 ${i / 3 + 1}:</strong> ${category}</p>`;
-                        output += `<p><strong>子分类1:</strong> ${subcategory1}</p>`;
-                        output += `<p><strong>子分类2:</strong> ${subcategory2}</p>`;
+                        const subcategory1 = row[i] || "无数据";
+                        const subcategory2 = row[i + 1] || "无数据";
+                        const subcategory3 = row[i + 2] || "无数据";
+                        output += `<p>阵营: ${subcategory1}</p>`;
+                        output += `<p>昵称: ${subcategory2}</p>`;
+                        output += `<p>数字ID: ${subcategory3}</p>`;
                     }
                     output += "<br>";
                 }
@@ -85,6 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('output-stage').style.display = 'block';
         console.log("Output generated:", output);  // 调试信息
     }
+
 
     document.getElementById('generate-hash').addEventListener('click', function() {
         const results = collectResults();
