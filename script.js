@@ -55,30 +55,31 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function displayFormattedData(filteredData) {
         let output = "<h3>筛选后的学校数据：</h3>";
-
-        if (filteredData.length < 3) {
-            console.warn("Not enough data to display.");  // 调试信息
-            output += "<p>没有足够的数据可以展示。</p>";
+    
+        // 这里假设 filteredData 包含的是数据行，没有表头
+        if (filteredData.length === 0) {
+            console.warn("No data to display.");  // 调试信息
+            output += "<p>没有数据可以展示。</p>";
         } else {
-            const categories = filteredData[0]; // 第一行是大分类
-            const subcategories = filteredData[1]; // 第二行是小分类
-
-            filteredData.slice(2).forEach((row, index) => {
-                console.log(`Processing row ${index + 1}:`, row);  // 调试信息
-                output += `<h4>${categories[0]} ${index + 1}:</h4>`; // 大分类名加序号
-                subcategories.forEach((subcategory, idx) => {
-                    if (row[idx] !== undefined && subcategory !== undefined) {
-                        output += `<p><strong>${subcategory}:</strong> ${row[idx]}</p>`; // 小分类及其对应的内容
-                    }
-                });
+            filteredData.forEach((row, index) => {
+                output += `<h4>选手 ${index + 1}:</h4>`; // 大分类名加序号
+                for (let i = 0; i < row.length; i += 3) {
+                    const category = row[i];
+                    const subcategory1 = row[i + 1] || "无数据";
+                    const subcategory2 = row[i + 2] || "无数据";
+                    output += `<p><strong>分类 ${i / 3 + 1}:</strong> ${category}</p>`;
+                    output += `<p><strong>子分类1:</strong> ${subcategory1}</p>`;
+                    output += `<p><strong>子分类2:</strong> ${subcategory2}</p>`;
+                }
                 output += "<br>";
             });
         }
-
+    
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
         console.log("Output generated:", output);  // 调试信息
     }
+
     
     document.getElementById('generate-hash').addEventListener('click', function() {
         const results = collectResults();
