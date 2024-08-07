@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://unpkg.com/@vercel/analytics/dist/vercel-analytics.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -38,6 +39,9 @@
             <div id="restored-data" style="display:none; border: 2px solid #000; padding: 10px; margin-bottom: 20px;">
                 <h3>上次填写的数据：</h3>
                 <pre id="restored-data-content"></pre>
+            </div>
+                <h3>筛选后的学校数据：</h3>
+                <pre id="filtered-data"></pre>
             </div>
             <div id="matches"></div>
             <button id="add-bo" style="display:none;">添加BO3</button>

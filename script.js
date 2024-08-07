@@ -1,42 +1,65 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const schools = [
-        "北京市第十九中学",
-        "北京市中关村中学",
-        "BLC",
-        "RDL",
-        "北京市第八中学",
-        "DioDa",
-        "ZX",
-        "Wave",
-        "OvO",
-        "中国人民大学附属中学",
-        "清纯白毛小萝莉队",
-        "北京卫生职业学院",
-        "北京市和平街第一中学",
-        "北京市三里屯一中",
-        "北京师范大学实验中学丰台学校",
-        "北京市第三十五中学",
-        "清华附中朝阳学校",
-        "北京师范大学附属实验中学",
-        "北京教师进修学校附属实验学校",
-        "北京交通大学附属中学第二分校",
-        "北大附中朝阳未来学校",
-        "清华大学附属学校将台路校区",
-        "北京市第十二中学",
-        "清华大学附属中学",
-        "北京化工大学附属中学",
-        "北京师范大学燕化附属中学",
-        "潞河中学",
-        "北京市密云区第二中学",
-        "北京市第二中学通州校区",
-        "北京市人民大学附属中学第二分校",
-        "北京信息管理学校中关村校区",
-        "北京市第十八中学",
-        "不可一世的赌徒",
-        "北京市第二十二中学",
-        "北京市建华实验亦庄学校",
-        "QAQ"
-    ];
+    fetch('https://gen.cdsv.cc/data/schools-data.xlsx')
+        .then(response => response.arrayBuffer())
+        .then(data => {
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            // 填充学校下拉列表
+            populateSelectOptions(excelData);
+
+            document.getElementById('next-button').addEventListener('click', function() {
+                const homeTeam = document.getElementById('home-team').value;
+                const awayTeam = document.getElementById('away-team').value;
+
+                if (homeTeam && awayTeam) {
+                    const filteredData = filterData(excelData, homeTeam, awayTeam);
+                    displayFilteredData(filteredData);
+                } else {
+                    alert('请选择队伍');
+                }
+            });
+        });
+
+    function populateSelectOptions(data) {
+        const homeTeamSelect = document.getElementById('home-team');
+        const awayTeamSelect = document.getElementById('away-team');
+
+        const schools = new Set(data.slice(1).map(row => row[0])); // 获取所有学校名称
+
+        schools.forEach(school => {
+            const option1 = document.createElement('option');
+            option1.value = school;
+            option1.textContent = school;
+            homeTeamSelect.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = school;
+            option2.textContent = school;
+            awayTeamSelect.appendChild(option2);
+        });
+    }
+
+    function filterData(data, homeTeam, awayTeam) {
+        const header = data[0]; // 第一行作为表头
+        const filteredData = data.filter(row => row[0] === homeTeam || row[0] === awayTeam);
+
+        return [header].concat(filteredData); // 包含表头的筛选结果
+    }
+
+    function displayFilteredData(filteredData) {
+        let output = "<h3>筛选后的学校数据：</h3><pre>";
+
+        filteredData.forEach(row => {
+            output += row.join(" | ") + "\n";
+        });
+
+        output += "</pre>";
+        document.getElementById('filtered-data').innerHTML = output;
+        document.getElementById('output-stage').style.display = 'block';
+    }
     
     document.getElementById('generate-hash').addEventListener('click', function() {
         const results = collectResults();
@@ -88,19 +111,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     const homeTeamSelect = document.getElementById('home-team');
     const awayTeamSelect = document.getElementById('away-team');
-
-    // 初始化下拉框
-    function populateSelectOptions(selectElement, options) {
-        options.forEach(school => {
-            const option = document.createElement('option');
-            option.value = school;
-            option.textContent = school;
-            selectElement.appendChild(option);
-        });
-    }
-
-    populateSelectOptions(homeTeamSelect, schools);
-    populateSelectOptions(awayTeamSelect, schools);
 
     document.getElementById('next-button').addEventListener('click', function() {
         const homeTeam = homeTeamSelect.value;
