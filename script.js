@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const worksheet = workbook.Sheets[firstSheetName];
             const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             
+            console.log("Excel Data Loaded:", excelData);  // 调试信息
+
             // 填充学校下拉列表
             populateSelectOptions(excelData);
 
@@ -16,18 +18,21 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (homeTeam && awayTeam) {
                     const filteredData = filterData(excelData, homeTeam, awayTeam);
+                    console.log("Filtered Data:", filteredData);  // 调试信息
                     displayFormattedData(filteredData);
                 } else {
                     alert('请选择队伍');
                 }
             });
-        });
+        })
+        .catch(error => console.error("Error loading Excel file:", error));  // 错误处理
 
     function populateSelectOptions(data) {
         const homeTeamSelect = document.getElementById('home-team');
         const awayTeamSelect = document.getElementById('away-team');
 
         const schools = new Set(data.slice(2).map(row => row[0])); // 从第三行开始，获取所有学校名称
+        console.log("Schools Found:", schools);  // 调试信息
 
         schools.forEach(school => {
             const option1 = document.createElement('option');
@@ -44,27 +49,35 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function filterData(data, homeTeam, awayTeam) {
         const filteredData = data.filter(row => row[0] === homeTeam || row[0] === awayTeam);
+        console.log("Data after filtering:", filteredData);  // 调试信息
         return filteredData;
     }
 
     function displayFormattedData(filteredData) {
         let output = "<h3>筛选后的学校数据：</h3>";
 
-        const categories = filteredData[0]; // 第一行是大分类
-        const subcategories = filteredData[1]; // 第二行是小分类
+        if (filteredData.length < 3) {
+            console.warn("Not enough data to display.");  // 调试信息
+            output += "<p>没有足够的数据可以展示。</p>";
+        } else {
+            const categories = filteredData[0]; // 第一行是大分类
+            const subcategories = filteredData[1]; // 第二行是小分类
 
-        filteredData.slice(2).forEach((row, index) => {
-            output += `<h4>${categories[0]} ${index + 1}:</h4>`; // 大分类名加序号
-            subcategories.forEach((subcategory, idx) => {
-                if (row[idx] !== undefined && subcategory !== undefined) {
-                    output += `<p><strong>${subcategory}:</strong> ${row[idx]}</p>`; // 小分类及其对应的内容
-                }
+            filteredData.slice(2).forEach((row, index) => {
+                console.log(`Processing row ${index + 1}:`, row);  // 调试信息
+                output += `<h4>${categories[0]} ${index + 1}:</h4>`; // 大分类名加序号
+                subcategories.forEach((subcategory, idx) => {
+                    if (row[idx] !== undefined && subcategory !== undefined) {
+                        output += `<p><strong>${subcategory}:</strong> ${row[idx]}</p>`; // 小分类及其对应的内容
+                    }
+                });
+                output += "<br>";
             });
-            output += "<br>";
-        });
+        }
 
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
+        console.log("Output generated:", output);  // 调试信息
     }
     
     document.getElementById('generate-hash').addEventListener('click', function() {
