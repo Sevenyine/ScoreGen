@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const homeTeamSelect = document.getElementById('home-team');
         const awayTeamSelect = document.getElementById('away-team');
 
-        const schools = new Set(data.map(row => row[0])); // 获取所有学校名称
+        const schools = new Set(data.slice(1).map(row => row[0])); // 从第二行开始，获取所有学校名称
 
         schools.forEach(school => {
             const option1 = document.createElement('option');
@@ -56,51 +56,31 @@ document.addEventListener("DOMContentLoaded", function() {
     function displayFormattedData(filteredDataHome, filteredDataAway) {
         let output = "<h3>筛选后的学校数据：</h3>";
 
-        const categoriesHome = filteredDataHome[0] || []; // 检查是否有数据
-        const categoriesAway = filteredDataAway[0] || [];
-        
-        console.log("Categories Home:", categoriesHome);
-        console.log("Categories Away:", categoriesAway);
+        const homeTeam = filteredDataHome.length > 0 ? filteredDataHome[0][0] : null;
+        const awayTeam = filteredDataAway.length > 0 ? filteredDataAway[0][0] : null;
 
-        let playerCounter = 1; // 选手计数器
-
-        // Display Home Team Data
-        if (filteredDataHome.length > 1) {
-            output += `<h2>${categoriesHome[0]}:</h2>`;
-            filteredDataHome.forEach((row, index) => {
-                if (index > 0) { // 跳过第一行（标题行）
-                    output += `<h3>选手 ${playerCounter}:</h3>`;
-                    row.forEach((value, idx) => {
-                        if (idx > 0) { // 跳过第一个单元格（学校名称）
-                            output += `<p>${categoriesHome[idx]}: ${value}</p>`;
-                        }
-                    });
-                    playerCounter++;
+        if (homeTeam) {
+            output += `<h2>${homeTeam}:</h2>`;
+            filteredDataHome.slice(1).forEach((row, index) => {
+                output += `<h3>选手 ${index + 1}:</h3>`;
+                for (let i = 1; i < row.length; i += 3) {
+                    output += `<p>阵营: ${row[i + 2] || '无'}, 昵称: ${row[i] || '无'}, 数字ID: ${row[i + 1] || '无'}</p>`;
                 }
             });
         } else {
-            output += `<p>${categoriesHome[0]}: 没有足够的数据可以展示。</p>`;
+            output += `<p>${homeTeam}: 没有足够的数据可以展示。</p>`;
         }
 
-        // Reset playerCounter for Away Team
-        playerCounter = 1;
-
-        // Display Away Team Data
-        if (filteredDataAway.length > 1) {
-            output += `<h2>${categoriesAway[0]}:</h2>`;
-            filteredDataAway.forEach((row, index) => {
-                if (index > 0) { // 跳过第一行（标题行）
-                    output += `<h3>选手 ${playerCounter}:</h3>`;
-                    row.forEach((value, idx) => {
-                        if (idx > 0) { // 跳过第一个单元格（学校名称）
-                            output += `<p>${categoriesAway[idx]}: ${value}</p>`;
-                        }
-                    });
-                    playerCounter++;
+        if (awayTeam) {
+            output += `<h2>${awayTeam}:</h2>`;
+            filteredDataAway.slice(1).forEach((row, index) => {
+                output += `<h3>选手 ${index + 1}:</h3>`;
+                for (let i = 1; i < row.length; i += 3) {
+                    output += `<p>阵营: ${row[i + 2] || '无'}, 昵称: ${row[i] || '无'}, 数字ID: ${row[i + 1] || '无'}</p>`;
                 }
             });
         } else {
-            output += `<p>${categoriesAway[0]}: 没有足够的数据可以展示。</p>`;
+            output += `<p>${awayTeam}: 没有足够的数据可以展示。</p>`;
         }
 
         console.log("Output generated:", output); // 调试输出：生成的 HTML 内容
@@ -108,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
     }
+});
 
     document.getElementById('generate-hash').addEventListener('click', function() {
         const results = collectResults();
