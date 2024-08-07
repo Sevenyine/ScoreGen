@@ -7,8 +7,6 @@ document.addEventListener("DOMContentLoaded", function() {
             const worksheet = workbook.Sheets[firstSheetName];
             const excelData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
             
-            console.log("Excel Data Loaded:", excelData);  // 调试信息
-
             // 填充学校下拉列表
             populateSelectOptions(excelData);
 
@@ -17,22 +15,20 @@ document.addEventListener("DOMContentLoaded", function() {
                 const awayTeam = document.getElementById('away-team').value;
 
                 if (homeTeam && awayTeam) {
-                    const filteredData = filterData(excelData, homeTeam, awayTeam);
-                    console.log("Filtered Data:", filteredData);  // 调试信息
-                    displayFormattedData(filteredData);
+                    const filteredDataHome = filterData(excelData, homeTeam);
+                    const filteredDataAway = filterData(excelData, awayTeam);
+                    displayFormattedData(filteredDataHome, filteredDataAway);
                 } else {
                     alert('请选择队伍');
                 }
             });
-        })
-        .catch(error => console.error("Error loading Excel file:", error));  // 错误处理
+        });
 
     function populateSelectOptions(data) {
         const homeTeamSelect = document.getElementById('home-team');
         const awayTeamSelect = document.getElementById('away-team');
 
         const schools = new Set(data.slice(2).map(row => row[0])); // 从第三行开始，获取所有学校名称
-        console.log("Schools Found:", schools);  // 调试信息
 
         schools.forEach(school => {
             const option1 = document.createElement('option');
@@ -47,42 +43,44 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    function filterData(data, homeTeam, awayTeam) {
-        const filteredData = data.filter(row => row[0] === homeTeam || row[0] === awayTeam);
-        console.log("Data after filtering:", filteredData);  // 调试信息
-        return filteredData;
+    function filterData(data, team) {
+        return data.filter(row => row[0] === team);
     }
 
-    function displayFormattedData(filteredData) {
+    function displayFormattedData(filteredDataHome, filteredDataAway) {
         let output = "<h3>筛选后的学校数据：</h3>";
-    
-        if (filteredData.length === 0) {
-            console.warn("No data to display.");  // 调试信息
-            output += "<p>没有数据可以展示。</p>";
-        } else {
-            filteredData.forEach((row, index) => {
-                if (index === 0) {
-                    // 处理第一列为学校名称
-                    output += `<h4>学校名称:</h4>`;
-                    output += `<p>${row[0]}</p>`;
-                } else {
-                    output += `<h4>选手 ${index}:</h4>`; // 大分类名加序号
-                    for (let i = 1; i < row.length; i += 3) {
-                        const subcategory1 = row[i] || "无数据";
-                        const subcategory2 = row[i + 1] || "无数据";
-                        const subcategory3 = row[i + 2] || "无数据";
-                        output += `<p>阵营: ${subcategory1}</p>`;
-                        output += `<p>昵称: ${subcategory2}</p>`;
-                        output += `<p>数字ID: ${subcategory3}</p>`;
-                    }
-                    output += "<br>";
+
+        const categoriesHome = filteredDataHome[0]; // 第一行是大分类
+        const subcategoriesHome = filteredDataHome[1]; // 第二行是小分类
+        const categoriesAway = filteredDataAway[0];
+        const subcategoriesAway = filteredDataAway[1];
+
+        let playerCounter = 1; // 选手计数器
+
+        output += `<h2>${categoriesHome[0]}:</h2>`;
+        filteredDataHome.slice(2).forEach(row => {
+            output += `<h3>选手 ${playerCounter}:</h3>`;
+            for (let i = 0; i < subcategoriesHome.length; i++) {
+                if (subcategoriesHome[i]) {
+                    output += `<p>${subcategoriesHome[i]}: ${row[i]}</p>`;
                 }
-            });
-        }
-    
+            }
+            playerCounter++;
+        });
+
+        output += `<h2>${categoriesAway[0]}:</h2>`;
+        filteredDataAway.slice(2).forEach(row => {
+            output += `<h3>选手 ${playerCounter}:</h3>`;
+            for (let i = 0; i < subcategoriesAway.length; i++) {
+                if (subcategoriesAway[i]) {
+                    output += `<p>${subcategoriesAway[i]}: ${row[i]}</p>`;
+                }
+            }
+            playerCounter++;
+        });
+
         document.getElementById('filtered-data').innerHTML = output;
         document.getElementById('output-stage').style.display = 'block';
-        console.log("Output generated:", output);  // 调试信息
     }
 
 
