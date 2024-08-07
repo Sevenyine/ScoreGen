@@ -48,17 +48,19 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function displayFormattedData(filteredData) {
-        let output = "";
+        let output = "<h3>筛选后的学校数据：</h3>";
 
         const categories = filteredData[0]; // 第一行是大分类
         const subcategories = filteredData[1]; // 第二行是小分类
 
         filteredData.slice(2).forEach((row, index) => {
-            output += `## ${categories[0]} ${index + 1}:\n`; // 大分类名加序号
+            output += `<h4>${categories[0]} ${index + 1}:</h4>`; // 大分类名加序号
             subcategories.forEach((subcategory, idx) => {
-                output += `### ${subcategory}: ${row[idx]}\n`; // 小分类及其对应的内容
+                if (row[idx] !== undefined && subcategory !== undefined) {
+                    output += `<p><strong>${subcategory}:</strong> ${row[idx]}</p>`; // 小分类及其对应的内容
+                }
             });
-            output += "\n";
+            output += "<br>";
         });
 
         document.getElementById('filtered-data').innerHTML = output;
